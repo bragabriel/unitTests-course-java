@@ -11,7 +11,9 @@ import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
 
@@ -54,12 +56,12 @@ public class LocacaoServiceTest {
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
-        Filme filme = new Filme("Filme 1", 2, 5.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 5.0));
 
         System.out.println("Teste!");
 
         //acao
-        Locacao locacao = service.alugarFilme(usuario, filme);
+        Locacao locacao = service.alugarFilme(usuario, filmes);
 
         //verificacao
         error.checkThat(locacao.getValor(), is(5.0));
@@ -68,7 +70,6 @@ public class LocacaoServiceTest {
     }
 
     /* Exemplo de testes para: Filme Sem Estoque */
-
     //Dizendo que estamos esperando uma exceção neste teste
     //Forma Elegante: funciona bem quando apenas a exceção importa (quando a mensagem não importa)
     @Test(expected = FilmeSemEstoqueException.class)
@@ -76,10 +77,10 @@ public class LocacaoServiceTest {
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
-        Filme filme = new Filme("Filme 1", 0, 5.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 4.0));
 
         //acao
-        service.alugarFilme(usuario, filme);
+        service.alugarFilme(usuario, filmes);
     }
 
     @Test
@@ -87,11 +88,11 @@ public class LocacaoServiceTest {
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
-        Filme filme = new Filme("Filme 1", 0, 5.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 5.0));
 
         //acao
         try {
-            service.alugarFilme(usuario, filme);
+            service.alugarFilme(usuario, filmes);
 
             //Se voltar uma exceção vai para o catch, se não, dá fail.
             Assert.fail("Deveria ter lançado uma exceção!");
@@ -105,13 +106,13 @@ public class LocacaoServiceTest {
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
-        Filme filme = new Filme("Filme 1", 0, 5.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 5.0));
 
         exception.expect(Exception.class);
         exception.expectMessage("Filme sem estoque");
 
         //acao
-        service.alugarFilme(usuario, filme);
+        service.alugarFilme(usuario, filmes);
     }
 
     /* Fim dos Exemplos de testes para: Filme Sem Estoque */
@@ -121,12 +122,12 @@ public class LocacaoServiceTest {
     @Test
     public void testeLocacao_usuarioVazio() throws FilmeSemEstoqueException {
         //cenário
-        Filme filme = new Filme("Filme Z", 1, 4.0);
+        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0));
         Usuario usuario = new Usuario("Gabriel");
 
         //acao
         try {
-            service.alugarFilme(null, filme);
+            service.alugarFilme(null, filmes);
             Assert.fail();
         } catch (LocadoraException e) {
             Assert.assertThat(e.getMessage(), is("Usuário vazio"));
