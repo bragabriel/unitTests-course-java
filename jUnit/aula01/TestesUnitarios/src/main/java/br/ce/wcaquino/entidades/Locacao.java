@@ -6,7 +6,6 @@ import java.util.List;
 public class Locacao {
 
 	private Usuario usuario;
-
 	private List<Filme> filmes;
 	private Date dataLocacao;
 	private Date dataRetorno;

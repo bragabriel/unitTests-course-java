@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class LocacaoServiceTest {
 
@@ -52,8 +53,7 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacao() throws Exception {
-
+    public void deveAlugarFilmeComSucesso() throws Exception {
         //cenario
         Usuario usuario = new Usuario("Gabriel");
         List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 5.0));
@@ -73,7 +73,8 @@ public class LocacaoServiceTest {
     //Dizendo que estamos esperando uma exceção neste teste
     //Forma Elegante: funciona bem quando apenas a exceção importa (quando a mensagem não importa)
     @Test(expected = FilmeSemEstoqueException.class)
-    public void testeLocacao_filmeSemEstoque() throws Exception {
+    public void deveLancarExcecao_quandoAlugarFilmeSemEstoque() throws Exception {
+        //Forma Elegante
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
@@ -84,7 +85,8 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void testeLocacao_filmeSemEstoque2() {
+    public void deveLancarExcecao_quandoAlugarFilmeSemEstoque2() {
+        //Forma Robusta
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
@@ -97,12 +99,13 @@ public class LocacaoServiceTest {
             //Se voltar uma exceção vai para o catch, se não, dá fail.
             Assert.fail("Deveria ter lançado uma exceção!");
         } catch (Exception e) {
-            Assert.assertThat(e.getMessage(), CoreMatchers.is("Filme sem estoque"));
+            assertThat(e.getMessage(), CoreMatchers.is("Filme sem estoque"));
         }
     }
 
     @Test
-    public void testeLocacao_filmeSemEstoque3() throws Exception {
+    public void deveLancarExcecao_quandoAlugarFilmeSemEstoque3() throws Exception {
+        //Forma Nova
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
@@ -118,9 +121,9 @@ public class LocacaoServiceTest {
     /* Fim dos Exemplos de testes para: Filme Sem Estoque */
 
 
-    //Utilizaremos a forma: Robusta
     @Test
-    public void testeLocacao_usuarioVazio() throws FilmeSemEstoqueException {
+    public void naoDeveAlugarFilme_quandoUsuarioVazio() throws FilmeSemEstoqueException {
+    //Utilizaremos a forma: Robusta
         //cenário
         List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0));
         Usuario usuario = new Usuario("Gabriel");
@@ -130,13 +133,13 @@ public class LocacaoServiceTest {
             service.alugarFilme(null, filmes);
             Assert.fail();
         } catch (LocadoraException e) {
-            Assert.assertThat(e.getMessage(), is("Usuário vazio"));
+            assertThat(e.getMessage(), is("Usuário vazio"));
         }
     }
 
     //Utilizaremos a forma: Nova
     @Test
-    public void testeLocacao_filmeVazio() throws FilmeSemEstoqueException, LocadoraException {
+    public void naoDeveAlugarFilme_quandoFilmeVazio() throws FilmeSemEstoqueException, LocadoraException {
         //cenário
         Usuario usuario = new Usuario("Gabriel");
 
@@ -146,7 +149,91 @@ public class LocacaoServiceTest {
 
         //acao
         service.alugarFilme(usuario, null);
+    }
 
+    @Test
+    public void devePagar75PctNoFilme3() throws FilmeSemEstoqueException, LocadoraException {
+        //Desconto de 25%
+
+        //cenario
+        Usuario usuario = new Usuario("Usuario 1");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 3, 4.0),
+                new Filme("Filme 3", 1, 4.0)
+        );
+
+        //acao
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        //verificacao
+        //4+4+3 = 11 (25% de desconto no 3° filme)
+        assertThat(resultado.getValor(), CoreMatchers.is(11.0));
+    }
+
+    @Test
+    public void devePagar50PctNoFilme4() throws FilmeSemEstoqueException, LocadoraException {
+        //Desconto de 50%
+
+        //cenario
+        Usuario usuario = new Usuario("Usuario 1");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 3, 4.0),
+                new Filme("Filme 3", 1, 4.0),
+                new Filme("Filme 4", 2, 4.0)
+        );
+
+        //acao
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        //verificacao
+        //4+4+3+2 = 13 (25% de desconto no 3° filme, 50% de desc no 4°)
+        assertThat(resultado.getValor(), CoreMatchers.is(13.0));
+    }
+
+    @Test
+    public void devePagar75PctNoFilme5() throws FilmeSemEstoqueException, LocadoraException {
+        //Desconto de 75%
+
+        //cenario
+        Usuario usuario = new Usuario("Usuario 1");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 3, 4.0),
+                new Filme("Filme 3", 1, 4.0),
+                new Filme("Filme 4", 2, 4.0),
+                new Filme("Filme 5", 2, 4.0)
+        );
+
+        //acao
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        //verificacao
+        //4+4+3+2+1 = 14 (25% de desc no 3°, 50% de desc no 4°, 75% de desc no 5°)
+        assertThat(resultado.getValor(), CoreMatchers.is(14.0));
+    }
+    @Test
+    public void devePagar100PctNoFilme6() throws FilmeSemEstoqueException, LocadoraException {
+        //Desconto de 100%
+
+        //cenario
+        Usuario usuario = new Usuario("Usuario 1");
+        List<Filme> filmes = Arrays.asList(
+                new Filme("Filme 1", 2, 4.0),
+                new Filme("Filme 2", 3, 4.0),
+                new Filme("Filme 3", 1, 4.0),
+                new Filme("Filme 4", 2, 4.0),
+                new Filme("Filme 5", 2, 4.0),
+                new Filme("Filme 6", 3, 4.0)
+        );
+
+        //acao
+        Locacao resultado = service.alugarFilme(usuario, filmes);
+
+        //verificacao
+        //4+4+3+2+1+0 = 14 (25% de desc no 3°, 50% de desc no 4°, 75% de desc no 5°, 100% de desc no 6°)
+        assertThat(resultado.getValor(), CoreMatchers.is(14.0));
     }
 
 }
