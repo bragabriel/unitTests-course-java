@@ -1,5 +1,6 @@
 package br.ce.wcaquino.servicos;
 
+import br.ce.wcaquino.builder.UsuarioBuilder;
 import br.ce.wcaquino.entidades.Filme;
 import br.ce.wcaquino.entidades.Locacao;
 import br.ce.wcaquino.entidades.Usuario;
@@ -18,6 +19,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -60,8 +62,8 @@ public class LocacaoServiceTest {
         Assume.assumeFalse(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
 
         //cenario
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 5.0));
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilme().comValor(5.0).agora());
 
         System.out.println("Teste!");
 
@@ -83,7 +85,7 @@ public class LocacaoServiceTest {
 
         //cenario
         Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 4.0));
+        List<Filme> filmes = Arrays.asList(umFilme().semEstoque().agora());
 
         //acao
         service.alugarFilme(usuario, filmes);
@@ -94,8 +96,8 @@ public class LocacaoServiceTest {
         //Forma Robusta
 
         //cenario
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 5.0));
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilme().semEstoque().agora());
 
         //acao
         try {
@@ -113,8 +115,8 @@ public class LocacaoServiceTest {
         //Forma Nova
 
         //cenario
-        Usuario usuario = new Usuario("Gabriel");
-        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 0, 5.0));
+        Usuario usuario = UsuarioBuilder.umUsuario().agora();
+        List<Filme> filmes = Arrays.asList(umFilme().semEstoque().agora());
 
         exception.expect(Exception.class);
         exception.expectMessage("Filme sem estoque");
@@ -130,7 +132,7 @@ public class LocacaoServiceTest {
     public void naoDeveAlugarFilme_quandoUsuarioVazio() throws FilmeSemEstoqueException {
     //Utilizaremos a forma: Robusta
         //cenário
-        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 2, 4.0));
+        List<Filme> filmes = Arrays.asList(umFilme().agora());
         Usuario usuario = new Usuario("Gabriel");
 
         //acao
@@ -162,7 +164,7 @@ public class LocacaoServiceTest {
 
         //cenario
         Usuario usuario = new Usuario("Usuario 1");
-        List<Filme> filmes = Arrays.asList(new Filme("Filme 1", 1, 5.0));
+        List<Filme> filmes = Arrays.asList(umFilme().semEstoque().agora());
 
         //acao
         Locacao retorno = service.alugarFilme(usuario, filmes);
