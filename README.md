@@ -14,3 +14,8 @@ Foi realizado neste curso:
 * Criar builders de objetos para centralizar a criação de entidades.
 * Adicionar testes unitários em projetos legados, sem a necessidade de refatoração (Caso não seja possível).
 * Que um código legível é melhor que um código documentado.
+
+<br>
+
+## Teste Unitário x Outros testes
+* Teste Unitário: Um Teste Unitário não deve ter dependencia externa, como acesso ao banco, rede, arquivos ou qualquer outra entidade externa ao arquivo que queremos testar.
