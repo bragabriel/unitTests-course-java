@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 
 import static br.ce.wcaquino.builder.FilmeBuilder.umFilme;
+import static br.ce.wcaquino.builder.LocacaoBuilder.umLocacao;
 import static br.ce.wcaquino.builder.UsuarioBuilder.umUsuario;
 import static br.ce.wcaquino.utils.DataUtils.obterDataComDiferencaDias;
 import static org.hamcrest.CoreMatchers.is;
@@ -225,12 +226,16 @@ public class LocacaoServiceTest {
     public void deveEnviarEmailParaLocacaoesAtrasadas(){
         //cenario
         Usuario usuario = umUsuario().agora();
+        Usuario usuario2 = umUsuario().comNome("Usuario em dia").agora();
+        Usuario usuario3 = umUsuario().comNome("Outro atrasado").agora();
         List<Locacao> locacoes =
                 Arrays.asList(
                         LocacaoBuilder
-                                .umLocacao()
-                                .comUsuario(usuario)
-                                .comDataRetorno(obterDataComDiferencaDias(-2)).agora());
+                                .umLocacao().comUsuario(usuario).atrasado().agora(),
+                        LocacaoBuilder
+                                .umLocacao().comUsuario(usuario2).agora(),
+                        LocacaoBuilder
+                                .umLocacao().comUsuario(usuario3).atrasado().agora());
 
         Mockito.when(dao.obterLocacoesPendentes()).thenReturn(locacoes);
 
@@ -239,5 +244,6 @@ public class LocacaoServiceTest {
 
         //verificacao
         Mockito.verify(email).notificarAtraso(usuario);
+        Mockito.verify(email).notificarAtraso(usuario3);
     }
 }
