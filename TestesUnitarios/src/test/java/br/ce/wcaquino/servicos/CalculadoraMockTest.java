@@ -1,13 +1,51 @@
 package br.ce.wcaquino.servicos;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.*;
 
 import java.sql.SQLOutput;
 
 public class CalculadoraMockTest {
 
+    @Mock
+    private Calculadora calcMock;
+
+    @Spy
+    private Calculadora calcSpy;
+
+    //Não podemos utilizar SPY em interfaces
+    //Podemos utilizar MOCK em interfaces
+
+    @Before
+    public void setup(){
+        MockitoAnnotations.initMocks(this);
+        //inicializando os atributos calcMock e calcSpy automaticamente pelo mockito
+    }
+    @Test
+    public void devoMostrarDiferencaEntreMockSpy(){
+
+        Mockito.when(calcMock.somar(1, 2)).thenReturn(8);
+        Mockito.when(calcSpy.somar(1, 2)).thenReturn(8);
+
+        //Ele não vai chamar executar a função somar de fato
+        //Mockito.doReturn(5).when(calcSpy).somar(1, 2);
+
+        //Quando o mock não sabe o que retornar, ele retorna 0
+        System.out.println("Mock: " + calcMock.somar(1, 5));
+
+        //Quando o spy não sabe o que retornar, ele faz a execução real do método
+        System.out.println("Spy: " + calcSpy.somar(1, 5));
+
+        //Nao vai fazer nada quando calcSpy.imprime();
+        //Mockito.doNothing().when(calcSpy).imprime();
+
+        System.out.println("\n");
+        System.out.println("Mock: ");
+        calcMock.imprime();
+        System.out.println("Spy: ");
+        calcSpy.imprime();
+    }
     @Test
     public void teste(){
         Calculadora calc = Mockito.mock(Calculadora.class);
