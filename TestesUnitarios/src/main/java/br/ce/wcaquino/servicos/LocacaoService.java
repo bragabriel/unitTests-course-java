@@ -19,7 +19,6 @@ public class LocacaoService {
 
 	private LocacaoDAO dao;
 	private SPCService spcService;
-
 	private EmailService emailService;
 
 	public Locacao alugarFilme(Usuario usuario, List<Filme> filmes) throws FilmeSemEstoqueException, LocadoraException {
@@ -38,12 +37,16 @@ public class LocacaoService {
 			}
 		}
 
+		boolean negativado;
+
 		try {
-			if(spcService.possuiNegativacao(usuario)){
-				throw new LocadoraException("Usuário Negativado");
-			}
+			negativado = spcService.possuiNegativacao(usuario);
 		} catch (Exception e) {
 			throw new LocadoraException("Problemas com SPC, tente novamente");
+		}
+
+		if(negativado) {
+			throw new LocadoraException("Usuário Negativado");
 		}
 
 		Locacao locacao = new Locacao();
@@ -82,7 +85,6 @@ public class LocacaoService {
 		//Entrega no dia seguinte
 		Date dataEntrega = new Date();
 		dataEntrega = adicionarDias(dataEntrega, 1);
-		locacao.setDataRetorno(dataEntrega);
 		if(DataUtils.verificarDiaSemana(dataEntrega, Calendar.SUNDAY)){
 			dataEntrega = adicionarDias(dataEntrega, 1);
 		}
@@ -104,7 +106,13 @@ public class LocacaoService {
 		}
 	}
 
-
-
-
+	public void prorrogarLocacao(Locacao locacao, int dias){
+		Locacao novaLocacao = new Locacao();
+		novaLocacao.setUsuario(locacao.getUsuario());
+		novaLocacao.setFilmes(locacao.getFilmes());
+		novaLocacao.setDataLocacao(locacao.getDataLocacao());
+		novaLocacao.setDataRetorno(locacao.getDataRetorno());
+		novaLocacao.setValor(locacao.getValor() * dias);
+		dao.salvar(novaLocacao);
+	}
 }
