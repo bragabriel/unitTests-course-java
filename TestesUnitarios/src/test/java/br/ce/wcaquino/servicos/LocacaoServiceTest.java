@@ -14,7 +14,11 @@ import org.hamcrest.CoreMatchers;
 import org.junit.*;
 import org.junit.rules.ErrorCollector;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
 import org.mockito.*;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.util.Arrays;
 import java.util.Calendar;
@@ -31,6 +35,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
+@RunWith(PowerMockRunner.class)
+@PrepareForTest(LocacaoService.class)
 public class LocacaoServiceTest {
 
     @InjectMocks
@@ -176,12 +182,19 @@ public class LocacaoServiceTest {
     }
 
     @Test
-    public void deveDevolverNaSegundaAoAlugarNoSabado() throws FilmeSemEstoqueException, LocadoraException {
-        Assume.assumeTrue(DataUtils.verificarDiaSemana(new Date(), Calendar.SATURDAY));
+    public void deveDevolverNaSegundaAoAlugarNoSabado() throws Exception {
 
         //cenario
         Usuario usuario = new Usuario("Usuario 1");
-        List<Filme> filmes = Arrays.asList(umFilme().semEstoque().agora());
+        List<Filme> filmes = Arrays.asList(umFilme().agora());
+
+        //PowerMockito.whenNew(Date.class).withNoArguments().thenReturn(DataUtils.obterData(8, 4 ,2023));
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 29);
+        calendar.set(Calendar.MONTH, Calendar.APRIL);
+        calendar.set(Calendar.YEAR, 2017);
+        PowerMockito.mockStatic(Calendar.class);
+        PowerMockito.when(Calendar.getInstance()).thenReturn(calendar);
 
         //acao
         Locacao retorno = service.alugarFilme(usuario, filmes);
@@ -191,7 +204,7 @@ public class LocacaoServiceTest {
 //        Assert.assertTrue(ehSegunda);
 //        assertThat(retorno.getDataRetorno(), new DiaSemanaMatcher(Calendar.MONDAY));
           assertThat(retorno.getDataRetorno(), MatchersProprios.caiEm(Calendar.MONDAY));
-          assertThat(retorno.getDataRetorno(), MatchersProprios.caiNumaSegunda());
+//          assertThat(retorno.getDataRetorno(), MatchersProprios.caiNumaSegunda());
 
     }
 
